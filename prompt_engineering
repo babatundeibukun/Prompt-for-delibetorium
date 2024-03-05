@@ -1,0 +1,53 @@
+import openai
+
+# Set your OpenAI API key here
+openai.api_key = 'your_api_key_here'
+
+def generate_prompt(theme, questions):
+    """
+    Generate a prompt based on the given theme and questions.
+    
+    :param theme: A string representing the main theme.
+    :param questions: A list of dictionaries, each containing the question text and aspects like metrics, barriers, and solutions.
+    :return: A string representing the generated prompt.
+    """
+    prompt = f"Theme: {theme}\n\n"
+    for i, question in enumerate(questions, start=1):
+        prompt += f"Question {i}: {question['text']}\n"
+        prompt += "Focus:\n"
+        prompt += f"- Metrics: {question.get('metrics', 'N/A')}\n"
+        prompt += f"- Barriers: {question.get('barriers', 'N/A')}\n"
+        prompt += f"- Solutions: {question.get('solutions', 'N/A')}\n\n"
+    return prompt
+
+def analyze_text_with_gpt4(text):
+    """
+    Analyze the given text using OpenAI's GPT-4 to extract and categorize information.
+    
+    :param text: A string representing the text to be analyzed.
+    :return: The analysis result from GPT-4.
+    """
+    response = openai.Completion.create(
+        engine="text-davinci-003",  # Assuming 'davinci' is the model for GPT-4
+        prompt=text,
+        temperature=0.5,
+        max_tokens=1024,
+        top_p=1.0,
+        frequency_penalty=0.0,
+        presence_penalty=0.0
+    )
+    return response.choices[0].text.strip()
+
+# Example usage
+theme = "Environmental Sustainability"
+questions = [
+    {"text": "What are the key metrics for evaluating environmental sustainability?", "metrics": "CO2 emissions, water usage, deforestation rates"},
+    {"text": "What barriers exist in achieving environmental sustainability?", "barriers": "Economic constraints, lack of public awareness, regulatory challenges"},
+    {"text": "How can technology contribute to solving environmental issues?", "solutions": "Renewable energy sources, waste management technologies, environmental monitoring systems"}
+]
+
+prompt = generate_prompt(theme, questions)
+analysis_result = analyze_text_with_gpt4(prompt)
+
+print("Analysis Result:")
+print(analysis_result)
